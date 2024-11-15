@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>調酒探索與推薦系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2C0E37;
+            --accent: #FF2E63;
+            --neon: #08F7FE;
+            --background: #120318;
+            --text: #E2E8F0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 背景動畫效果 */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            filter: blur(100px);
+            animation: backgroundFlow 15s ease infinite;
+        }
+
+        @keyframes backgroundFlow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* 霓虹效果 */
+        .neon-text {
+            color: var(--neon);
+            text-shadow: 0 0 5px var(--neon),
+                         0 0 15px var(--neon),
+                         0 0 30px var(--neon);
+        }
+
+        /* 玻璃態效果 */
+        .glass-card {
+            background: rgba(44, 14, 55, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 導航欄樣式 */
+        .nav-link {
+            position: relative;
+            padding: 10px 20px;
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        /* 按鈕樣式 */
+        .neon-button {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .neon-button:hover {
+            background: var(--accent);
+            color: var(--background);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* 決策樹容器 */
+        .decision-tree {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 表單元素樣式 */
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 10px;
+            color: var(--text);
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        /* 漸變邊框效果 */
+        .gradient-border {
+            position: relative;
+            padding: 3px;
+            background: linear-gradient(45deg, var(--accent), var(--neon));
+            border-radius: 10px;
+        }
+
+        .gradient-border::after {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            background: var(--background);
+            border-radius: 9px;
+            z-index: -1;
+        }
+
+        /* 動畫載入效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .glass-card {
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+
+    <!-- 導航欄 -->
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="neon-text text-2xl font-bold">調酒探索</h1>
+            <div class="hidden md:flex space-x-6">
+                <a href="#home" class="nav-link">首頁</a>
+                <a href="#decision-tree" class="nav-link">決策樹</a>
+                <a href="#recommendations" class="nav-link">推薦</a>
+                <button id="loginBtn" class="neon-button">登入</button>
+            </div>
+            <button class="md:hidden neon-button">選單</button>
+        </div>
+    </nav>
+
+    <!-- 主要內容區 -->
+    <main class="container mx-auto pt-24">
+        <!-- 歡迎區域 -->
+        <section id="home" class="glass-card text-center mb-10 fade-in">
+            <h2 class="neon-text text-4xl mb-4">探索您的完美調酒</h2>
+            <p class="text-lg mb-6">根據您的喜好，為您推薦最適合的調酒</p>
+            <button class="neon-button" onclick="scrollToDecisionTree()">開始探索</button>
+        </section>
+
+        <!-- 決策樹區域 -->
+        <section id="decision-tree" class="glass-card fade-in">
+            <h3 class="text-2xl mb-6 neon-text">調酒決策系統</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block mb-2">口感偏好</label>
+                        <select class="form-input" id="taste">
+                            <option value="sweet">甜</option>
+                            <option value="sour">酸</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">酒精濃度</label>
+                        <select class="form-input" id="strength">
+                            <option value="low">低</option>
+                            <option value="medium">中</option>
+                            <option value="high">高</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">酒感程度</label>
+                        <select class="form-input" id="alcoholFeel">
+                            <option value="none">沒有酒感</option>
+                            <option value="light">微微酒感</option>
+                            <option value="strong">酒感重</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block mb-2">基酒選擇</label>
+                        <select class="form-input" id="baseSpirit">
+                            <option value="vodka">伏特加</option>
+                            <option value="gin">琴酒</option>
+                            <option value="rum">蘭姆酒</option>
+                            <option value="whiskey">威士忌</option>
+                            <option value="tequila">龍舌蘭</option>
+                            <option value="brandy">白蘭地</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">是否需要氣泡</label>
+                        <select class="form-input" id="bubble">
+                            <option value="yes">要</option>
+                            <option value="no">不要</option>
+                        </select>
+                    </div>
+                    <button class="neon-button w-full mt-4" onclick="findCocktails()">尋找調酒</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 推薦結果區域 -->
+        <section id="recommendations" class="glass-card mt-10 fade-in hidden">
+            <h3 class="text-2xl mb-6 neon-text">推薦調酒</h3>
+            <div id="results" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 結果將通過JavaScript動態添加 -->
+            </div>
+        </section>
+    </main>
+
+    <!-- 登入模態框 -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="glass-card w-96">
+            <h3 class="text-2xl mb-6 neon-text">會員登入</h3>
+            <form id="loginForm" class="space-y-4">
+                <input type="email" placeholder="電子郵件" class="form-input">
+                <input type="password" placeholder="密碼" class="form-input">
+                <button type="submit" class="neon-button w-full">登入</button>
+                <p class="text-center">
+                    <a href="#" class="text-accent hover:underline">註冊新帳號</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 調酒數據
+        const cocktailsData = [
+            {
+                name: "中國藍",
+                taste: "sweet",
+                strength: "low",
+                alcoholFeel: "none",
+                baseSpirit: "vodka",
+                bubble: "yes",
+                image: "459894606c1bdadc4b44502fb981ebf3"
+            },
+            // ... 其他調酒數據 ...
+        ];
+
+        // 登入模態框控制
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+            loginModal.classList.add('flex');
+        });
+
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.add('hidden');
+                loginModal.classList.remove('flex');
+            }
+        });
+
+        // 滾動到決策樹
+        function scrollToDecisionTree() {
+            document.getElementById('decision-tree').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // 尋找調酒
+        function findCocktails() {
+            const taste = document.getElementById('taste').value;
+            const strength = document.getElementById('strength').value;
+            const alcoholFeel = document.getElementById('alcoholFeel').value;
+            const baseSpirit = document.getElementById('baseSpirit').value;
+            const bubble = document.getElementById('bubble').value;
+
+            // 篩選邏輯
+            const recommendations = cocktailsData.filter(cocktail => {
+                return cocktail.taste === taste &&
+                       cocktail.strength === strength &&
+                       cocktail.alcoholFeel === alcoholFeel &&
+                       cocktail.baseSpirit === baseSpirit &&
+                       cocktail.bubble === bubble;
+            });
+
+            displayResults(recommendations);
+        }
+
+        // 顯示結果
+        function displayResults(recommendations) {
+            const resultsContainer = document.getElementById('results');
+            const recommendationsSection = document.getElementById('recommendations');
+            
+            resultsContainer.innerHTML = '';
+            recommendationsSection.classList.remove('hidden');
+
+            if (recommendations.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="col-span-full text-center">
+                        <p class="text-xl">沒有找到符合條件的調酒</p>
+                        <p class="mt-2">請嘗試不同的組合</p>
+                    </div>
+                `;
+                return;
+            }
+
+            recommendations.forEach(cocktail => {
+                const cocktailCard = document.createElement('div');
+                cocktailCard.className = 'glass-card';
+                cocktailCard.innerHTML = `
+                    <img src="https://picsum.photos/300/200?random=${Math.random()}" 
+                         alt="${cocktail.name}" 
+                         class="w-full h-48 object-cover rounded-lg mb-4">
+                    <h4 class="text-xl mb-2">${cocktail.name}</h4>
+                    <p class="mb-2">濃度: ${cocktail.strength}</p>
+                    <p class="mb-2">酒感: ${cocktail.alcoholFeel}</p>
+                    <button class="neon-button w-full" onclick="showDetails('${cocktail.name}')">
+                        查看詳情
+                    </button>
+                `;
+                resultsContainer.appendChild(cocktailCard);
+            });
+        }
+
+        // 顯示調酒詳情
+        function showDetails(cocktailName) {
+            // 實現調酒詳情顯示邏輯
+            alert(`顯示 ${cocktailName} 的詳細信息`);
+        }
+
+        // 頁面載入動畫
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.fade-in').forEach((element, index) => {
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>
